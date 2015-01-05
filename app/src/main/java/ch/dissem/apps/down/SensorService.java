@@ -28,19 +28,16 @@ public class SensorService implements SensorEventListener {
 
     private long lastGyroscopeTimestamp;
 
-    private boolean initState;
-
     private SensorFusionFilter filter;
 
     public SensorService(Context ctx) {
         sensorManager = (SensorManager) ctx.getSystemService(SENSOR_SERVICE);
-        filter = new SensorFusionFilter(0.98f);
+        filter = new SensorFusionFilter(0.97f);
         initListeners();
         new Timer().scheduleAtFixedRate(filter, 1000, 30);
     }
 
     public void initListeners() {
-        initState = true;
         sensorManager.registerListener(this,
                 sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER),
                 SensorManager.SENSOR_DELAY_FASTEST);
@@ -96,5 +93,9 @@ public class SensorService implements SensorEventListener {
     @Override
     public void onAccuracyChanged(Sensor sensor, int accuracy) {
         // NO OP
+    }
+
+    public Quaternion getOrientation() {
+        return filter.getOrientation();
     }
 }

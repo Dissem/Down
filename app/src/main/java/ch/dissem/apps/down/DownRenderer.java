@@ -3,11 +3,13 @@ package ch.dissem.apps.down;
 import android.opengl.GLES20;
 import android.opengl.GLSurfaceView;
 import android.opengl.Matrix;
-import android.os.SystemClock;
 import android.util.Log;
+import ch.dissem.libraries.math.Quaternion;
 
 import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
+
+import static ch.dissem.libraries.math.Quaternion.H;
 
 /**
  * Created by chris on 02.01.15.
@@ -21,7 +23,11 @@ public class DownRenderer implements GLSurfaceView.Renderer {
 
     private Arrow arrow;
 
-    private float angle;
+    private SensorService sensorService;
+
+    public DownRenderer(SensorService sensorService) {
+        this.sensorService = sensorService;
+    }
 
     public void onSurfaceCreated(GL10 unused, EGLConfig config) {
         // Set the background frame color
@@ -42,7 +48,11 @@ public class DownRenderer implements GLSurfaceView.Renderer {
         // Calculate the projection and view transformation
         Matrix.multiplyMM(mvpMatrix, 0, projectionMatrix, 0, viewMatrix, 0);
 
-        Matrix.setRotateM(rotationMatrix, 0, angle, 0, -1.0f, 0);
+        Quaternion orientation = sensorService.getOrientation();
+        if (orientation != null) {
+            Quaternion rotation = Quaternion.getRotation(H(0, 0, -1), orientation);
+            Matrix.setRotateM(rotationMatrix, 0, (float) (rotation.getPhi() * 360 / Math.PI), (float) -rotation.x, (float) rotation.y, (float) rotation.z);
+        }
 
         float[] scratch = new float[16];
         // Combine the rotation matrix with the projection and camera view
@@ -52,23 +62,6 @@ public class DownRenderer implements GLSurfaceView.Renderer {
 
         // Draw square
         arrow.draw(scratch);
-
-        // Create a rotation for the triangle
-
-        // Use the following code to generate constant rotation.
-        // Leave this code out when using TouchEvents.
-        // long time = SystemClock.uptimeMillis() % 4000L;
-        // float angle = 0.090f * ((int) time);
-
-//        Matrix.setRotateM(rotationMatrix, 0, mAngle, 0, 0, 1.0f);
-
-        // Combine the rotation matrix with the projection and camera view
-        // Note that the mvpMatrix factor *must be first* in order
-        // for the matrix multiplication product to be correct.
-//        Matrix.multiplyMM(scratch, 0, mvpMatrix, 0, rotationMatrix, 0);
-
-        // Draw triangle
-//        mTriangle.draw(scratch);
     }
 
     public void onSurfaceChanged(GL10 unused, int width, int height) {
@@ -122,13 +115,5 @@ public class DownRenderer implements GLSurfaceView.Renderer {
             Log.e("DownRenderer", glOperation + ": glError " + error);
             throw new RuntimeException(glOperation + ": glError " + error);
         }
-    }
-
-    public float getAngle() {
-        return angle;
-    }
-
-    public void setAngle(float angle) {
-        this.angle = angle;
     }
 }

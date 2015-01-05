@@ -31,16 +31,19 @@ public class SensorFusionFilter extends TimerTask {
     }
 
     public void updateAccelerator(Quaternion accValue) {
-        acceleratorOrientation = accValue;
+        if (acceleratorOrientation == null) {
+            acceleratorOrientation = accValue;
+        } else {
+            acceleratorOrientation = factor.multiply(acceleratorOrientation).add(coFactor.multiply(accValue));
+        }
     }
 
     public void update() {
         if (gyroOrientation == null)
-            fusedOrientation = acceleratorOrientation;
+            fusedOrientation = gyroOrientation = acceleratorOrientation;
         else {
-            fusedOrientation = coFactor.multiply(gyroOrientation).add(factor.multiply(acceleratorOrientation));
+            fusedOrientation = gyroOrientation = coFactor.multiply(gyroOrientation).add(factor.multiply(acceleratorOrientation));
         }
-        acceleratorOrientation = fusedOrientation;
     }
 
     public Quaternion getOrientation() {
