@@ -43,15 +43,19 @@ public class DownRenderer implements GLSurfaceView.Renderer {
         GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT | GLES20.GL_DEPTH_BUFFER_BIT);
 
         // Set the camera position (View matrix)
-        Matrix.setLookAtM(viewMatrix, 0, 0, 0, -3, 0f, 0f, 0f, 0f, 1.0f, 0.0f);
+        Matrix.setLookAtM(viewMatrix, 0,
+                0.0f, 0.0f, -3.0f, // eye
+                0f, 0f, 0f, // center
+                0.0f, 1.0f, 0.0f // up
+        );
 
         // Calculate the projection and view transformation
         Matrix.multiplyMM(mvpMatrix, 0, projectionMatrix, 0, viewMatrix, 0);
 
         Quaternion orientation = sensorService.getOrientation();
         if (orientation != null) {
-            Quaternion rotation = Quaternion.getRotation(H(0, 0, -1), orientation);
-            Matrix.setRotateM(rotationMatrix, 0, (float) (rotation.getPhi() * 360 / Math.PI), (float) -rotation.x, (float) rotation.y, (float) rotation.z);
+            Quaternion rotation = Quaternion.getRotation(H(0, 0, 1), orientation);
+            Matrix.setRotateM(rotationMatrix, 0, (float) (rotation.getPhi() * 360 / Math.PI), (float) rotation.x, (float) -rotation.y, (float) rotation.z);
         }
 
         float[] scratch = new float[16];
