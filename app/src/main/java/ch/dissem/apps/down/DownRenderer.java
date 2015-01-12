@@ -1,13 +1,11 @@
 package ch.dissem.apps.down;
 
 import android.content.Context;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import ch.dissem.libraries.math.Quaternion;
 import rajawali.BaseObject3D;
 import rajawali.lights.DirectionalLight;
-import rajawali.materials.DiffuseMaterial;
-import rajawali.primitives.Sphere;
+import rajawali.parser.AParser;
+import rajawali.parser.ObjParser;
 import rajawali.renderer.RajawaliRenderer;
 
 import javax.microedition.khronos.opengles.GL10;
@@ -19,7 +17,7 @@ import static java.lang.Math.PI;
  * Created by chris on 02.01.15.
  */
 public class DownRenderer extends RajawaliRenderer {
-    private BaseObject3D sphere;
+    private BaseObject3D arrow;
     private SensorService sensorService;
 
     public DownRenderer(Context context) {
@@ -34,13 +32,24 @@ public class DownRenderer extends RajawaliRenderer {
         light.setColor(1.0f, 1.0f, 1.0f);
         light.setPower(2);
 
-        Bitmap bg = BitmapFactory.decodeResource(mContext.getResources(), R.drawable.earth);
-        DiffuseMaterial material = new DiffuseMaterial();
-        sphere = new Sphere(1, 18, 18);
-        sphere.setMaterial(material);
-        sphere.addLight(light);
-        sphere.addTexture(mTextureManager.addTexture(bg));
-        addChild(sphere);
+        ObjParser objParser = new ObjParser(mContext.getResources(), mTextureManager, R.raw.arrow_obj);
+        try {
+            objParser.parse();
+        } catch (AParser.ParsingException e) {
+            throw new RuntimeException(e);
+        }
+        arrow = objParser.getParsedObject();
+        arrow.addLight(light);
+        arrow.setScale(0.1f);
+        addChild(arrow);
+//
+//        Bitmap bg = BitmapFactory.decodeResource(mContext.getResources(), R.drawable.earth);
+//        DiffuseMaterial material = new DiffuseMaterial();
+//        arrow = new Sphere(1, 18, 18);
+//        arrow.setMaterial(material);
+//        arrow.addLight(light);
+//        arrow.addTexture(mTextureManager.addTexture(bg));
+//        addChild(arrow);
 
         mCamera.setZ(4.2f);
     }
@@ -50,10 +59,10 @@ public class DownRenderer extends RajawaliRenderer {
 
         Quaternion orientation = sensorService.getOrientation();
         if (orientation != null) {
-            Quaternion rotation = Quaternion.getRotation(H(0, 1, 0), orientation);
+            Quaternion rotation = Quaternion.getRotation(H(0, 0, 1), orientation);
 
             double[] rot = rotation.getEulerAngles();
-            sphere.setRotation((float) (-rot[0] * 180 / PI), 0, (float) (-rot[1] * 180 / PI));
+            arrow.setRotation((float) (90 - rot[0] * 180 / PI), (float) (-rot[1] * 180 / PI), (float) (-rot[1] * 180 / PI));
         }
     }
 }
