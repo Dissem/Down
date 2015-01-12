@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="primary">#4ecefd</color>
+    <color name="primary_dark">#03aeee</color>
+    <color name="secondary">#f49424</color>
+    <color name="accent">#03aeee</color>
+    <color name="wind">#a7e6fd</color>
+    <color name="temperature">#fdf8a7</color>
+    <color name="rain">#ffcfe0e6</color>
+    <color name="pressure">#ffffcf99</color>
+</resources>
