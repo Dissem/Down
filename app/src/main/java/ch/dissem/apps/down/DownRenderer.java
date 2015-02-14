@@ -4,6 +4,7 @@ import android.content.Context;
 import ch.dissem.libraries.math.Quaternion;
 import rajawali.BaseObject3D;
 import rajawali.lights.DirectionalLight;
+import rajawali.materials.DiffuseMaterial;
 import rajawali.parser.AParser;
 import rajawali.parser.ObjParser;
 import rajawali.renderer.RajawaliRenderer;
@@ -28,9 +29,13 @@ public class DownRenderer extends RajawaliRenderer {
 
     protected void initScene() {
         setBackgroundColor(1, 1, 1, 1);
-        DirectionalLight light = new DirectionalLight(1f, 0.2f, -1.0f); // set the direction
-        light.setColor(1.0f, 1.0f, 1.0f);
-        light.setPower(2);
+        DirectionalLight light1 = new DirectionalLight(1f, 0.2f, -1.0f); // set the direction
+        light1.setColor(1.0f, 1.0f, 1.0f);
+        light1.setPower(1);
+
+        DirectionalLight light2 = new DirectionalLight(-1f, -0.2f, 1.0f); // set the direction
+        light2.setColor(1.0f, 1.0f, 1.0f);
+        light2.setPower(0.1f);
 
         ObjParser objParser = new ObjParser(mContext.getResources(), mTextureManager, R.raw.arrow_obj);
         try {
@@ -39,17 +44,14 @@ public class DownRenderer extends RajawaliRenderer {
             throw new RuntimeException(e);
         }
         arrow = objParser.getParsedObject();
-        arrow.addLight(light);
+        DiffuseMaterial material = new DiffuseMaterial();
+        material.setAmbientColor(getContext().getResources().getColor(R.color.primary_dark));
+        material.setUseColor(true);
+        arrow.setMaterial(material);
+        arrow.addLight(light1);
         arrow.setScale(0.1f);
+        arrow.setColor(getContext().getResources().getColor(R.color.primary));
         addChild(arrow);
-//
-//        Bitmap bg = BitmapFactory.decodeResource(mContext.getResources(), R.drawable.earth);
-//        DiffuseMaterial material = new DiffuseMaterial();
-//        arrow = new Sphere(1, 18, 18);
-//        arrow.setMaterial(material);
-//        arrow.addLight(light);
-//        arrow.addTexture(mTextureManager.addTexture(bg));
-//        addChild(arrow);
 
         mCamera.setZ(4.2f);
     }
