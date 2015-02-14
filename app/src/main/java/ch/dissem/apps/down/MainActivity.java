@@ -1,24 +1,21 @@
 package ch.dissem.apps.down;
 
 import android.os.Bundle;
-import rajawali.RajawaliActivity;
+import android.support.v7.app.ActionBarActivity;
+import android.support.v7.widget.Toolbar;
 
 
-public class MainActivity extends RajawaliActivity {
+public class MainActivity extends ActionBarActivity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-//        setContentView(R.layout.activity_main);
-//
-//        setSupportActionBar((Toolbar) findViewById(R.id.toolbar));
-//
-//        Fragment3D content = new Fragment3D();
-//        getSupportFragmentManager()
-//                .beginTransaction()
-//                .add(R.id.container, content, "rajawali")
-//                .commit();
+        setContentView(R.layout.activity_main);
+        setSupportActionBar((Toolbar) findViewById(R.id.toolbar));
 
-        DownRenderer renderer = new DownRenderer(this);
-        renderer.setSurfaceView(mSurfaceView);
-        setRenderer(renderer);
+        if (savedInstanceState == null) {
+            Fragment3D testFragment = new Fragment3D();
+            getFragmentManager().beginTransaction()
+                    .add(R.id.container, testFragment, "testFragment")
+                    .commit();
+        }
     }
 }
